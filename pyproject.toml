@@ -1,0 +1,15 @@
+[project]
+name = "csv-geocode"
+version = "0.1.0"
+description = "Geocode locations from a CSV file with the Google Maps API"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+authors = [{ name = "Fintan Ryan" }]
+dependencies = [
+    "googlemaps>=4.10.0,<5",
+]
+
+[tool.uv]
+package = false
+required-version = "==0.13.6"
