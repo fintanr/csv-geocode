@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 #
 # csv-geocode.py
 #
@@ -9,7 +9,11 @@
 # requires an api key for googlemaps
 #
 
-import os, csv, json, argparse, googlemaps
+import argparse
+import csv
+import os
+
+import googlemaps
 
 print_blanks = False
 our_key = "Not Set"
@@ -22,18 +26,20 @@ def extract_loc_details(gmapref, address):
     # and latitude, so we discard everything else
     geocode_result = gmapref.geocode(address)
 
-    lat = geocode_result[0]['geometry']['location']['lat']
-    lng = geocode_result[0]['geometry']['location']['lng']
+    lat = geocode_result[0]["geometry"]["location"]["lat"]
+    lng = geocode_result[0]["geometry"]["location"]["lng"]
 
-    return(lat, lng)
+    return lat, lng
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--csvfile', help='Input CSV File', required=True)
-    parser.add_argument('-o', '--outfile', help='Output CSV File', required=True)
-    parser.add_argument('-k', '--key', help='Key/Column name in CSV, defaults to Location')
-    parser.add_argument('-b', '--blanks', help='Print blank lines in output')
+    parser.add_argument("-c", "--csvfile", help="Input CSV File", required=True)
+    parser.add_argument("-o", "--outfile", help="Output CSV File", required=True)
+    parser.add_argument(
+        "-k", "--key", help="Key/Column name in CSV, defaults to Location"
+    )
+    parser.add_argument("-b", "--blanks", help="Print blank lines in output")
 
     args = parser.parse_args()
 
@@ -46,10 +52,10 @@ if __name__ == '__main__':
     if args.blanks:
         print_blanks = True
 
-    if ( os.getenv('GOOGLE_API_KEY') is not None):
-        our_key = os.getenv('GOOGLE_API_KEY')
+    if os.getenv("GOOGLE_API_KEY") is not None:
+        our_key = os.getenv("GOOGLE_API_KEY")
     else:
-        print "Please set GOOGLE_API_KEY"
+        print("Please set GOOGLE_API_KEY")
         exit(1)
 
     try:
@@ -57,18 +63,19 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
 
-    with open(our_outfile, 'w') as outfile:
-        fieldnames = ['Location', 'Lat', 'Lon']
+    with open(our_outfile, "w", newline="", encoding="utf-8") as outfile:
+        fieldnames = ["Location", "Lat", "Lon"]
         writer = csv.DictWriter(outfile, fieldnames)
         writer.writeheader()
-        with open(our_infile, 'r') as csvfile:
+        with open(our_infile, "r", newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                if ( row[csv_key] == "" ):
-                    if ( print_blanks ):
-                        writer.writerow({'Location': '', 'Lat': '', 'Lon': ''})
+                if row[csv_key] == "":
+                    if print_blanks:
+                        writer.writerow({"Location": "", "Lat": "", "Lon": ""})
                 else:
-                    ( lat, lon) = extract_loc_details(gmaps, row[csv_key])
-                    writer.writerow({'Location': row[csv_key], 'Lat': lat, 'Lon': lon})
-
+                    (lat, lon) = extract_loc_details(gmaps, row[csv_key])
+                    writer.writerow(
+                        {"Location": row[csv_key], "Lat": lat, "Lon": lon}
+                    )
 
